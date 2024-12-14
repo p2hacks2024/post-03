@@ -98,11 +98,14 @@
     - scan
     - pilot
 - Figma
-- Firebase
+-- Firebase
     - Analytics
     - App Distribution
     - Authentication
+    - IAM
+        - Workload Identity Federation
     - Cloud Messaging
+    - Cloud Scheduler
     - Cloud Storage
     - Crashlytics
     - Remote Config
