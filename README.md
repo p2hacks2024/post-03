@@ -98,7 +98,7 @@
     - scan
     - pilot
 - Figma
--- Firebase
+- Firebase
     - Analytics
     - App Distribution
     - Authentication
