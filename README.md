@@ -31,27 +31,66 @@
 
 スクリーンショット(任意)  
 
-## 開発体制  
+## 開発体制
 
-役割分担  
-及川寛太： iOSエンジニア  
-大須賀雅也： サーバーサイドエンジニア  
-萩野汰一： デザイナー  
-下村蒔里萌： デザイナー
+役割分担
 
+| メンバー | 担当 |
+| --- | --- |
+| 及川 寛太 | iOS |
+| 大須賀 雅也 | サーバ |
+| 萩野 汰一 | デザイン |
+| 下村 蒔里萌 | デザイン |
 
-開発における工夫した点  
-別リポジトリで開発を進めています。開発の途中経過は---を参照してください。
+開発における工夫した点
 
+めっちゃ頑張った
 
-## 開発技術 
+## 開発技術
 
-利用したプログラミング言語  
+利用したプログラミング言語
+
 - Swift
 - Go
 
-利用したフレームワーク・ライブラリ  
-- Gin
+利用したフレームワーク・ライブラリ
+
+- apple/swift-openapi-generator
+- firebase/firebase-ios-sdk
+- gin-gonic/gin
+- oapi-codegen/oapi-codegen
+- Open API
+- Apple Frameworks
+    - App Extension (Share)
+    - AuthenticationService
+    - Observation
+    - PhotosUI
+    - SpriteKit
+    - SwiftUI
+    - UserNotifications
+    - Swift Package Manager
+    - Swift Testing
 
 その他開発に使用したツール・サービス
+
+- fastlane
+    - match
+    - gym
+    - scan
+    - pilot
 - Figma
+- Firebase
+    - Analytics
+    - App Distribution
+    - Authentication
+    - Cloud Messaging
+    - Cloud Storage
+    - Crashlytics
+    - Remote Config
+- GitHub
+- GitHub Actions
+- Google Cloud Platform
+- Slack
+- Swagger UI
+- TestFlight
+- Xcode
