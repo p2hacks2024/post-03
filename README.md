@@ -43,8 +43,12 @@
 | 下村 蒔里萌 | デザイン |
 
 開発における工夫した点
-
-めっちゃ頑張った
+以下下書き
+- Slack
+- App Distribution
+- Figma
+- Open API
+- CI/CD
 
 ## 開発技術
 
