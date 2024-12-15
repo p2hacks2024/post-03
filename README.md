@@ -1,26 +1,18 @@
 # P2HACKS2024 アピールシート 
 
 ## プロダクト名  
-<img width="1411" alt="スクリーンショット 2024-12-15 1 41 36" src="https://github.com/user-attachments/assets/3c1cf344-c022-46b0-9ac8-3c34869f7887" />
 
+コンセプト  
+貯めて、流して、後回しをスッキリ
 
-### コンセプト  
-溜めて、流して、あとまわしをスッキリ
-  
-### 対象ユーザ  
-あとで読む記事を放置しがちな人全員
-    
-### 利用の流れ
-1. あとまわしリンクを貯める  
-2. 読む  
-3. フラッシュ  
-    
+対象ユーザ  
+あとで読もうと思っていた記事のブックマーク、Chromeのリーディングリスト、#timesにあとで見ようと上げた動画のリンク...
+そんな「あとまわしリンク」を溜めがちな人へ
 
-### あとまわしリンクが溢れる  
-1. フレンドに共有される
-2. 催促される(通知)
-3. 読む
-4. フラッシュ
+利用の流れ  
+1. あとまわしリンクを溜める
+2. あとまわしリンクを限界まで溜めると、溢れたあとまわしリンクはフレンドにFlushされる、または消えてしまう
+3. フレンドに迷惑をかけて社会的なプレッシャーを感じる、またはあとまわしリンクが消えてしまう前に、あとまわしリンクを消化する
 
 
 ### 推しポイント  
@@ -32,6 +24,9 @@
 - 通知が来る
 - ネイティブ特有の機能
 
+スクリーンショット(任意)  
+<img width="1920" alt="15" src="https://github.com/user-attachments/assets/c912f78f-ec8e-4064-968d-4fdab7db0de0" />
+
 
 ### リンク
 - [iOS App Repo](https://github.com/dolater/dolater-ios)
@@ -40,9 +35,6 @@
 - [プロトタイプ](https://www.figma.com/design/bTdDbS0ix3CKSm7cttcUJv/Prototype?node-id=0-1&t=4W6SWC64HQwPsM2A-1)
 - [ブレインストーム](https://www.figma.com/board/hfp8oItDdY33GMKFs90R7h/Brainstorm?node-id=0-1&t=LrMIpOZR6LBTSss4-1)
 - スライド
-
-
-### スクリーンショット  
 
 
 ## 開発体制
@@ -57,7 +49,6 @@
 | 下村 蒔里萌 | デザイン |
 
 ### 開発における工夫した点
-以下下書き
 - Slack
 - App Distribution
 - Figma
