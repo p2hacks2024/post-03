@@ -1,0 +1,223 @@
+default_platform(:ios)
+
+platform :ios do
+  def get_app_store_connect_api_key
+    app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_KEY_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT_BASE64"],
+      is_key_content_base64: true,
+    )
+  end
+
+  before_all do
+    ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "1800"
+  end
+
+  after_all do
+    reset_build_number
+  end
+
+  desc "Gym Development"
+  lane :gym_development do
+    match_fetch_development
+    gym(
+      export_options: {
+        method: "development",
+        provisioningProfiles: {
+          "com.kantacky.DoLater": "match Development com.kantacky.DoLater",
+          "com.kantacky.DoLater.ShareExtension": "match Development com.kantacky.DoLater.ShareExtension",
+        },
+      },
+    )
+  end
+
+  desc "Gym AdHoc"
+  lane :gym_adhoc do
+    match_fetch_adhoc
+    gym(
+      export_options: {
+        method: "ad-hoc",
+        provisioningProfiles: {
+          "com.kantacky.DoLater": "match AdHoc com.kantacky.DoLater",
+          "com.kantacky.DoLater.ShareExtension": "match AdHoc com.kantacky.DoLater.ShareExtension",
+        },
+      },
+    )
+  end
+
+  desc "Gym AppStore"
+  lane :gym_appstore do
+    match_fetch_appstore
+    gym(
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "com.kantacky.DoLater": "match AppStore com.kantacky.DoLater",
+          "com.kantacky.DoLater.ShareExtension": "match AppStore com.kantacky.DoLater.ShareExtension",
+        },
+      },
+    )
+  end
+
+  desc "Scan Development"
+  lane :scan_development do
+    match_fetch_development
+    scan
+  end
+
+  desc "Distribute the app to Firebase App Distribution"
+  lane :distribute_firebase do
+    latest_release = firebase_app_distribution_get_latest_release(
+      app: ENV["FIREBASE_APP_ID"],
+    )
+    increment_build_number(
+      build_number: latest_release[:buildVersion].to_i + 1
+    )
+    gym_adhoc
+    release = firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID"],
+      groups: ENV["FIREBASE_APP_DISTRIBUTION_GROUPS"],
+    )
+    slack(
+      message: "Do Later App Distributed to Firebase:",
+      slack_url: ENV["SLACK_URL"],
+      attachment_properties: {
+        image_url: "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=#{release[:testingUri]}",
+        fields: [
+          {
+            title: "App Version",
+            value: "#{release[:displayVersion]} (#{release[:buildVersion]})",
+            short: true,
+          },
+          {
+            title: "URL",
+            value: "#{release[:testingUri]}",
+            short: true,
+          },
+        ]
+      },
+    )
+  end
+
+  desc "Pilot App Store"
+  lane :pilot_appstore do
+    gym_appstore
+    pilot(
+      api_key: get_app_store_connect_api_key,
+    )
+    slack(
+      message: "Do Later App Distributed to TestFlight:",
+      slack_url: ENV["SLACK_URL"],
+    )
+  end
+
+  desc "Deliver App Store"
+  lane :deliver_appstore do
+    gym_appstore
+    deliver(
+      api_key: get_app_store_connect_api_key,
+    )
+    slack(
+      message: "Do Later App Uploaded to AppStore:",
+      slack_url: ENV["SLACK_URL"],
+    )
+  end
+
+  desc "Reset Build Number"
+  lane :reset_build_number do
+    increment_build_number(build_number: "1")
+  end
+
+  desc "Bump Build Number"
+  lane :bump_build_number do
+    increment_build_number
+  end
+
+  desc "Bump Patch Version"
+  lane :bump_patch_version do
+    increment_version_number(bump_type: "patch")
+  end
+
+  desc "Bump Minor Version"
+  lane :bump_minor_version do
+    increment_version_number(bump_type: "minor")
+  end
+
+  desc "Bump Major Version"
+  lane :bump_major_version do
+    increment_version_number(bump_type: "major")
+  end
+
+  desc "Match Development"
+  lane :match_development do
+    match(
+      type: "development",
+      api_key: get_app_store_connect_api_key,
+    )
+  end
+
+  desc "Match Ad Hoc"
+  lane :match_adhoc do
+    match(
+      type: "adhoc",
+      api_key: get_app_store_connect_api_key,
+    )
+  end
+
+  desc "Match App Store"
+  lane :match_appstore do
+    match(
+      type: "appstore",
+      api_key: get_app_store_connect_api_key,
+    )
+  end
+
+  desc "Fetch Development"
+  lane :match_fetch_development do
+    match(
+      type: "development",
+      readonly: true,
+    )
+  end
+
+  desc "Fetch Ad Hoc"
+  lane :match_fetch_adhoc do
+    match(
+      type: "adhoc",
+      readonly: true,
+    )
+  end
+
+  desc "Fetch App Store"
+  lane :match_fetch_appstore do
+    match(
+      type: "appstore",
+      readonly: true,
+    )
+  end
+
+  desc "Delete Development"
+  lane :match_delete_development do
+    match_nuke(
+      type: "development",
+      api_key: get_app_store_connect_api_key,
+    )
+  end
+
+  desc "Delete Ad Hoc"
+  lane :match_delete_adhoc do
+    match_nuke(
+      type: "adhoc",
+      api_key: get_app_store_connect_api_key,
+    )
+  end
+
+  desc "Delete App Store"
+  lane :match_delete_appstore do
+    match_nuke(
+      type: "appstore",
+      api_key: get_app_store_connect_api_key,
+    )
+  end
+end

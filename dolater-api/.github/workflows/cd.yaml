@@ -1,0 +1,108 @@
+name: CD
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment_name:
+        description: Environment
+        required: true
+        type: choice
+        options:
+          - dev
+          - stg
+          - production
+jobs:
+  set-env:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.set-env.outputs.image_tag }}
+      service_name: ${{ steps.set-env.outputs.service_name }}
+      service_name_suffix: ${{ steps.set-env.outputs.service_name_suffix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set Environmet
+        id: set-env
+        uses: ./.github/actions/set-env
+        with:
+          repository: ${{ github.repository }}
+          event_name: ${{ github.event_name }}
+          ref: ${{ github.ref }}
+          sha: ${{ github.sha }}
+          ar_hostname: ${{ vars._AR_HOSTNAME }}
+          project_id: ${{ vars.PROJECT_ID }}
+          environment_name: ${{ github.event.inputs.environment_name }}
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    needs: set-env
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        run: |
+          docker build \
+          -t ${{ needs.set-env.outputs.image_tag }} \
+          . \
+          -f Dockerfile \
+          --no-cache
+      - name: Authenticate
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT }}
+      - name: Setup Google Cloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ vars.PROJECT_ID }}
+      - name: Configure Docker
+        run: |
+          gcloud auth \
+          configure-docker \
+          ${{ vars._AR_HOSTNAME }}
+      - name: Push
+        run: |
+          docker push \
+          ${{ needs.set-env.outputs.image_tag }}
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    needs:
+      - set-env
+      - build-and-push
+    steps:
+      - name: Authenticate
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT }}
+      - name: Deploy
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ needs.set-env.outputs.service_name }}
+          image: ${{ needs.set-env.outputs.image_tag }}
+          region: ${{ vars._DEPLOY_REGION }}
+          env_vars: |
+            POSTGRES_HOST=${{ vars.POSTGRES_HOST }}
+            POSTGRES_PORT=${{ vars.POSTGRES_PORT }}
+            POSTGRES_NAME=${{ vars.POSTGRES_NAME }}
+            POSTGRES_USER=${{ vars.POSTGRES_USER }}
+            POSTGRES_PASS=${{ vars.POSTGRES_PASS }}
+            POSTGRES_SSL_MODE=${{ vars.POSTGRES_SSL_MODE }}
+            POSTGRES_ROOT_CERT_PATH=/secret/postgres/ca-crt/ca.crt
+            POSTGRES_CLIENT_CERT_PATH=/secret/postgres/client-crt/client.crt
+            POSTGRES_CLIENT_KEY_PATH=/secret/postgres/client-key/client.key
+          env_vars_update_strategy: overwrite
+          secrets: |
+            /secret/postgres/ca-crt/ca.crt=${{ vars.POSTGRES_CA_CERT_SECRET_NAME }}:latest
+            /secret/postgres/client-crt/client.crt=${{ vars.POSTGRES_CLIENT_CERT_SECRET_NAME }}:latest
+            /secret/postgres/client-key/client.key=${{ vars.POSTGRES_CLIENT_KEY_SECRET_NAME }}:latest
+          secrets_update_strategy: overwrite

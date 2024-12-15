@@ -1,0 +1,72 @@
+name: Set Environment
+description: Set up environment
+inputs:
+  repository:
+    description: github.repository
+    required: true
+  event_name:
+    description: github.event_name
+    required: true
+  ref:
+    description: github.ref
+    required: true
+  sha:
+    description: github.sha
+    required: true
+  ar_hostname:
+    description: vars._AR_HOSTNAME
+    required: true
+  project_id:
+    description: vars.PROJECT_ID
+    required: true
+  environment_name:
+    description: Environment such as dev, dev0, ..., stg, stg0, ...,  or production
+    required: true
+
+outputs:
+  image_tag:
+    description: Docker image tag
+    value: ${{ steps.set-env.outputs.image_tag }}
+  service_name:
+    description: Service name
+    value: ${{ steps.set-env.outputs.service_name }}
+  service_name_suffix:
+    description: Service name suffix
+    value: ${{ steps.set-env.outputs.service_name_suffix }}
+
+runs:
+  using: composite
+  steps:
+    - id: set-env
+      run: |
+        if [ "${{ inputs.event_name }}" == "workflow_dispatch" ]; then
+          if [ "${{ inputs.ref }}" == "refs/heads/main" ]; then
+            if [ "${{ inputs.environment_name }}" != "production" ]; then
+              export SERVICE_NAME_SUFFIX="-${{ inputs.environment_name }}"
+            fi
+          else
+            if [ "${{ inputs.environment_name }}" != "production" ]; then
+              if [ "${{ inputs.environment_name }}" != "stg" ]; then
+                export SERVICE_NAME_SUFFIX="-${{ inputs.environment_name }}"
+              fi
+            else
+              exit 1
+            fi
+          fi
+        elif [ "${{ inputs.event_name }}" == "push" ]; then
+          if [ "${{ inputs.ref }}" == "refs/heads/main" ]; then
+            export SERVICE_NAME_SUFFIX="-stg"
+          else
+            exit 1
+          fi
+        else
+          exit 1
+        fi
+
+        export REPO_NAME=$(echo ${{ inputs.repository }} | awk -F '/' '{print $2}')
+        export SERVICE_NAME="$REPO_NAME$SERVICE_NAME_SUFFIX"
+
+        echo "image_tag=${{ inputs.ar_hostname }}/${{ inputs.project_id }}/github-actions/$REPO_NAME/$SERVICE_NAME:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+        echo "service_name=$SERVICE_NAME" >> "$GITHUB_OUTPUT"
+        echo "service_name_suffix=$SERVICE_NAME_SUFFIX" >> "$GITHUB_OUTPUT"
+      shell: bash

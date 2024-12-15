@@ -1,0 +1,45 @@
+openapi: "3.0.3"
+info:
+  title: Do Later Internal API
+  description: Do Later Internal API
+  version: 1.0.0
+servers:
+  - url: https://api.internal.dolater.kantacky.com
+    description: Production Server
+  - url: https://stg.api.internal.dolater.kantacky.com
+    description: Staging Server
+  - url: https://dev.api.internal.dolater.kantacky.com
+    description: Development Server
+  - url: http://localhost:8080
+    description: Local Server
+paths:
+  /checkCapacity:
+    post:
+      tags:
+        - task
+      summary: Check Capacity
+      description: Check capacity of the pool
+      operationId: checkCapacity
+      responses:
+        204:
+          $ref: "#/components/responses/NoContent"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    NoContent:
+      description: No Content
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            message: Internal Server Error
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string

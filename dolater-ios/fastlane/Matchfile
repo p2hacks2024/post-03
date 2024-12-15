@@ -1,0 +1,5 @@
+git_url("git@github.com:dolater/ios-certificates.git")
+storage_mode("git")
+type("development")
+app_identifier(["com.kantacky.DoLater", "com.kantacky.DoLater.ShareExtension"])
+username("k.oikawa@kantacky.com")
