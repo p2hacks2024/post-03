@@ -37,7 +37,7 @@
 - [API (Internal) Repo](https://github.com/dolater/dolater-internal-api)
 - [プロトタイプ](https://www.figma.com/design/bTdDbS0ix3CKSm7cttcUJv/Prototype?node-id=0-1&t=4W6SWC64HQwPsM2A-1)
 - [ブレインストーム](https://www.figma.com/board/hfp8oItDdY33GMKFs90R7h/Brainstorm?node-id=0-1&t=LrMIpOZR6LBTSss4-1)
-- スライド
+- [スライド](https://www.figma.com/slides/99WQhkmzgyt0A7uxPwcs2r/Presentation?node-id=38-32&t=kcMZ52ZDAQl73yXv-1)
 
 ## 開発体制
 
